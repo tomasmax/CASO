@@ -1,0 +1,4 @@
+Inicializar esta variable de entorno con el path a esta librería
+Modificar .bashrc en tu home
+
+LD_LIBRARY_PATH=<path-a-esta-librería>

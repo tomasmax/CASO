@@ -1,0 +1,11 @@
+#
+# Configuration file for Name Server
+#
+# own level
+es
+# servidores registrados
+# direcciones de servidores inferiores
+deusto.es 127.0.0.1:1234
+yahoo.es 127.0.0.1:5678
+ehu.es 127.0.0.1:9999
+# direcciones de servidores superiores
