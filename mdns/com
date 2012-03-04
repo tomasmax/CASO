@@ -1,0 +1,9 @@
+#
+# Configuration file for Name Server
+#
+# own level
+com
+# servidores registrados
+# direcciones de servidores inferiores
+upv.com 127.0.0.1:8888
+# direcciones de servidores superiores
