@@ -75,7 +75,12 @@ namespace PracticaCaso {
 
 		// TODO: If there is a .DB file with previously learned mappings load them into dns2IpPortMap
 		if(this->leerCache){
-			
+			map<string, string> tempMap = this->sqliteMap->getMap();
+            typedef map<string, string>::const_iterator CI;
+            for (CI p = tempMap.begin(); p != tempMap.end(); ++p)
+            {
+                this->dns2IpPortMap[p->first] = p->second;
+            }
 		}
 		
 	}
@@ -122,6 +127,8 @@ namespace PracticaCaso {
 							cout << "Child Name server to process request: " << p->first << endl;
 							string ipPortTemp = delegateExternalDnsServer(p->second, dnsName);
 							// TODO: cache the already resolved names in other DNS servers both in memory and sqlite3
+							this->sqliteMap->set(dnsName, ipPortTemp);
+							this->dns2IpPortMap[dnsName] = ipPortTemp;
 							return ipPortTemp;
 						}
 					}
@@ -136,6 +143,8 @@ namespace PracticaCaso {
 						cout << "Parent Name server to process request: " << segment << ": " << this->dns2IpPortMap[segment] << endl;
 						string ipPortTemp = delegateExternalDnsServer(this->dns2IpPortMap[segment], dnsName);
 						// TODO: cache the already resolved names in other DNS servers both in memory and sqlite3
+						this->sqliteMap->set(dnsName, ipPortTemp);
+						this->dns2IpPortMap[dnsName] = ipPortTemp;
 						return ipPortTemp;
 					} else {
 						npos = segment.find(".");
@@ -205,10 +214,17 @@ void processClientRequest(PracticaCaso::TcpClient *dnsClient, PracticaCaso::Name
 
 int main(int argc, char** argv) {
 	signal(SIGINT,ctrl_c);
+	bool params = true;
 
-	if (argc != 3) {
-		usage();
-	}
+    if (argc < 3 ) {
+        usage();
+    }
+    //if the last argument is false and there are 4 arguments
+    if (argc == 4 && (strcmp(argv[3], "false") == 0))
+    {
+        params = false;
+        cout << "is false: " << argv[3];
+    }
 
 	PracticaCaso::NameServer nameServer(atoi(argv[1]), (string)argv[2], false);
 	cout << "NameServer instance: " << endl << nameServer << endl;
