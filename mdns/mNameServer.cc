@@ -170,6 +170,9 @@ namespace PracticaCaso {
 			// Parse a little bit event parameters.
 			// Three parameters: Command, Payload [dnsName or IpPort string], and random verification-code.
 			ins >> command >> payload >> code;
+			//[DONE]2.3.9 (1) Locate and implement the invocation of the mdns_management() method
+			this->client->mdns_management(command, payload, code)
+			cout << "mDNSObserver: mdns_management call ok" << endl;
 			
 		}	
 	}
@@ -185,16 +188,27 @@ namespace PracticaCaso {
 	void mNameServer::mdns_management(string cmd, string payload, string code) {
 		map<string, string>::iterator p;
 		string dnsValue;
-		// Begin management utility function.
+		//[DONE] 2.3.9 (2) Begin management utility function.
+		if (strcmp(cmd.c_str(), MDNS_REQUEST) == 0){
+			this->mdns_manage_request(cmd, payload, code);
+		}
+		else
+		{
+			this->mdns_manage_response(cmd, payload, code);
+		}
 
 	}
 
 	void mNameServer::mdns_manage_response(string cmd, string payload, string code) {
-	cout << "mdns_management: MDNS_RESPONSE received" << endl;
+		cout << "mdns_management: MDNS_RESPONSE received" << endl;
 
+     //[DONE]2.3.9 (3)
 	// Check if there is any pending query.
 	// The arrived MDNS_RESPONSE may be addressed to me.
 	// And then check if the MDNS_RESPONSE corresponds to pendingQuery. Use random code.
+		if ((strcmp(this->pendingQueryCode.c_str(), code.c_str()) == 0) && !this->satisfiedQuery){
+			this->dns2IpPortMap[pendingQuery] = payload;
+			this->sqliteMap->set(pendingQuery, payload);
 	// satisfiedQuery establishes a default FIRST-FIT criterion. Other methods are welcome. */
 	// Yes, there was a MDNS_RESPONSE, but not for me. This MDNS_RESPONSE can flow, or it  can crash... be the mdns_response, my friend. 
 	// It they don't come to me, snoopy cache can be implemented for efficiency. 
@@ -205,6 +219,14 @@ namespace PracticaCaso {
 	// It they don't come to me, snoopy cache can be implemented for efficiency. 
 	// Warning! Man-in-the-middle poisoning attacks enabling.
 	// Query cache
+			this->solvedQuery = payload;
+			this->pendingQuery = "";
+			this->satisfiedQuery = true;
+		}
+		else
+		{
+			cout << "No pendingQuery or not for me " << endl;
+		}
 
 	}
 			
