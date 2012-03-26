@@ -231,15 +231,30 @@ namespace PracticaCaso {
 	}
 			
 	void mNameServer::mdns_manage_request(string cmd, string payload, string code) {
-	map<string, string>::iterator p;
+	map<string, string>::iterator it;
 	string dnsValue;
+	//[DONE]2.3.9 (4) Implement the mdns_manage_request()
 
 	// One MDNS_REQUEST received: you must lookup your table and answer or not.
+
+	it = this->dns2IpPortMap.find(payLoad);
+	if (it != this->dns2IpPortMap.end()){ //Found
 	// Lookup the local table. RFC doesn't recommend recursive looking up.
 	// If the requested dnsName is in the local table, response. If don't, not to.
 	// Send the good MDNS_RESPONSE.
-	// If the requested dnsName is not in the local table, don't do anything.
-	// It can be interesting to use a MDNS_ERROR RESPONSE, but with some overhead.	
+		dnsValue = it->second;
+		ostringstream q;
+		//MDNS_REQUEST building with parameters Command, dnsName and random verif
+		q << MDNS_RESPONSE << " " << dnsValue << " " << code;
+		cout << "MDNS_RESPONSE is : " << q.str() << " " << "for the resolved dnsName" << payload << endl;
+		this->queryWrapper->send(q.str());
+	}
+	else {
+		// If the requested dnsName is not in the local table, don't do anything.
+	// It can be interesting to use a MDNS_ERROR RESPONSE, but with some overhead.
+	
+	}
+		
 
 	}
 
